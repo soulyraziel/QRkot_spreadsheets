@@ -25,7 +25,7 @@ async def get_report(
         session: AsyncSession = Depends(get_async_session),
         wrapper_services: Aiogoogle = Depends(get_service)
 ):
-    """Только для суперюзеров."""
+    """Формирует отчет и возвращает ссылку на него."""
     projects = await charity_project_crud.get_projects_by_completion_rate(
         session
     )
@@ -34,10 +34,9 @@ async def get_report(
     try:
         await spreadsheets_update_value(spreadsheetid, projects,
                                         wrapper_services)
-    except ValueError:
+    except ValueError as error:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail='Невозможно сформировать отчет, так как '
-            'создаваемая таблица слишком велика'
+            detail=str(error)
         )
     return {'url': url}
