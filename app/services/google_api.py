@@ -3,7 +3,8 @@ from datetime import datetime
 from aiogoogle import Aiogoogle
 
 from app.constants import (
-    REPORT_ROW_COUNT, REPORT_COL_COUNT, FORMAT, UNICODE_START_CHAR_NUM
+    REPORT_ROW_COUNT, REPORT_COL_COUNT, FORMAT, UNICODE_START_CHAR_NUM,
+    TABLE_VALUES_DATE_ROW_INDEX, TABLE_VALUES_DATE_COL_INDEX
 )
 from app.core.config import settings
 
@@ -42,12 +43,6 @@ TABLE_VALUES = [
 async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
     """Создает новый документ, возвращая его ID и ссылку на него."""
     service = await wrapper_services.discover('sheets', 'v4')
-    '''
-    current_date = datetime.now().strftime(FORMAT)
-    SPREADSHEET_BODY['properties']['title'] = (
-        f'Отчёт на {current_date}'
-    )
-    '''
     SPREADSHEET_BODY.update()
     response = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=SPREADSHEET_BODY)
@@ -81,7 +76,9 @@ async def spreadsheets_update_value(
     """Обновляет содержимое документа."""
     service = await wrapper_services.discover('sheets', 'v4')
     current_date = datetime.now().strftime(FORMAT)
-    TABLE_VALUES[0][1] = current_date
+    TABLE_VALUES[TABLE_VALUES_DATE_ROW_INDEX][TABLE_VALUES_DATE_COL_INDEX] = (
+        current_date
+    )
     for project in projects:
         new_row = [
             str(project.name),
