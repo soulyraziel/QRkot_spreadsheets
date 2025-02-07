@@ -10,7 +10,7 @@ from app.core.config import settings
 
 
 SPREADSHEET_BODY = {
-    'properties': {'title': f'{datetime.now().strftime(FORMAT)}',
+    'properties': {'title': f'Отчёт на {datetime.now().strftime(FORMAT)}',
                    'locale': 'ru_RU'},
     'sheets': [
         {
@@ -43,7 +43,9 @@ TABLE_VALUES = [
 async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
     """Создает новый документ, возвращая его ID и ссылку на него."""
     service = await wrapper_services.discover('sheets', 'v4')
-    SPREADSHEET_BODY.update()
+    SPREADSHEET_BODY['properties'].update(
+        title=f'Отчёт на {datetime.now().strftime(FORMAT)}'
+    )
     response = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=SPREADSHEET_BODY)
     )
